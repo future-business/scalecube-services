@@ -5,6 +5,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.epoll.EpollDatagramChannel;
 import io.netty.channel.epoll.EpollEventLoopGroup;
+import io.netty.handler.codec.DatagramPacketDecoder;
 import io.scalecube.services.benchmarks.datagram.Configurations;
 import io.scalecube.services.benchmarks.datagram.RateReporter;
 import java.net.InetSocketAddress;
@@ -25,11 +26,14 @@ public class EpollDatagramReceiverTps {
                   @Override
                   protected void initChannel(Channel ch) {
                     ch.pipeline().addLast(new ChannelHandlerImpl());
-                    ch.pipeline().addLast(new ByteToMessageDecoderImpl(reporter));
+                    ch.pipeline()
+                        .addLast(new DatagramPacketDecoder(new MessageDecoder(null, reporter)));
                   }
                 });
 
     Channel channel = bootstrap.bind(new InetSocketAddress(9000)).await().channel();
+
+    System.out.println("Channel pipeline: " + channel.pipeline());
 
     channel.closeFuture().get();
   }

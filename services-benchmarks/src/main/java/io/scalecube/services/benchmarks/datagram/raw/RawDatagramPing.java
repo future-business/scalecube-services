@@ -37,6 +37,7 @@ public class RawDatagramPing {
     Thread senderThread =
         new Thread(
             () -> {
+              System.out.println("Sending..");
               while (true) {
                 ByteBuffer sndBuffer = (ByteBuffer) Configurations.SENDER_BUFFER.position(0);
                 sndBuffer.putLong(0, System.nanoTime()); // put start time
@@ -50,6 +51,7 @@ public class RawDatagramPing {
     Thread receiverThread =
         new Thread(
             () -> {
+              System.out.println("Receiving..");
               while (true) {
                 ByteBuffer rcvBuffer = (ByteBuffer) Configurations.RECEIVER_BUFFER.position(0);
                 SocketAddress srcAddress = Runners.receive(receiver, rcvBuffer);

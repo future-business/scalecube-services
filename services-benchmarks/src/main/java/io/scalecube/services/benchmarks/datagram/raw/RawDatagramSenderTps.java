@@ -22,9 +22,9 @@ public class RawDatagramSenderTps {
     Thread senderThread =
         new Thread(
             () -> {
+              System.out.println("Sending..");
               while (true) {
                 ByteBuffer sndBuffer = (ByteBuffer) Configurations.SENDER_BUFFER.position(0);
-                sndBuffer.putLong(0, System.nanoTime()); // put start time
                 Runners.write(sender, sndBuffer);
               }
             });
