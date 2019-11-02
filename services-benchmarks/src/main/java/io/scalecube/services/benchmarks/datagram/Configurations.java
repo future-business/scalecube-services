@@ -1,10 +1,11 @@
 package io.scalecube.services.benchmarks.datagram;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import java.io.IOException;
-import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.PortUnreachableException;
 import java.net.SocketAddress;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.time.Duration;
@@ -17,38 +18,42 @@ import reactor.core.publisher.Flux;
 
 public class Configurations {
 
-  static final int REPORT_INTERVAL = Integer.getInteger("reporter.interval", 1);
-  static final int WARMUP_REPORT_DELAY = Integer.getInteger("reporter.delay", REPORT_INTERVAL);
-  static final int MESSAGE_SIZE = Integer.getInteger("messageSize", 256);
-  static final InetAddress RECEIVER_ADDRESS;
-
-  static final ByteBuffer SENDER_BUFFER;
-  static final ByteBuffer RECEIVER_BUFFER;
+  public static final int REPORT_INTERVAL = Integer.getInteger("reporter.interval", 1);
+  public static final int WARMUP_REPORT_DELAY =
+      Integer.getInteger("reporter.delay", REPORT_INTERVAL);
+  public static final int MESSAGE_LENGTH = Integer.getInteger("messageLength", 256);
+  public static final InetSocketAddress PING_ADDRESS;
+  public static final InetSocketAddress PONG_ADDRESS;
+  public static final ByteBuffer SENDER_BUFFER;
+  public static final ByteBuffer RECEIVER_BUFFER;
+  public static final ByteBuf PAYLOAD =
+      ByteBufAllocator.DEFAULT.buffer(Configurations.MESSAGE_LENGTH);
 
   static {
-    byte[] bytes = new byte[MESSAGE_SIZE];
+    byte[] bytes = new byte[MESSAGE_LENGTH];
     new Random().nextBytes(bytes);
-    SENDER_BUFFER = ByteBuffer.allocateDirect(MESSAGE_SIZE);
+    SENDER_BUFFER = ByteBuffer.allocateDirect(MESSAGE_LENGTH);
     SENDER_BUFFER.put(bytes).position(0);
-    RECEIVER_BUFFER = ByteBuffer.allocateDirect(MESSAGE_SIZE);
-    try {
-      RECEIVER_ADDRESS = InetAddress.getByName(System.getProperty("receiverAddress", "localhost"));
-    } catch (UnknownHostException e) {
-      throw Exceptions.propagate(e);
-    }
+    RECEIVER_BUFFER = ByteBuffer.allocateDirect(MESSAGE_LENGTH);
+    PING_ADDRESS = new InetSocketAddress(System.getProperty("pingAddress", "localhost"), 8000);
+    PONG_ADDRESS = new InetSocketAddress(System.getProperty("pongAddress", "localhost"), 9000);
+    PAYLOAD.writeBytes(bytes);
   }
 
-  static final Recorder HISTOGRAM = new Recorder(TimeUnit.SECONDS.toNanos(10), 3);
+  public static final Recorder HISTOGRAM = new Recorder(TimeUnit.SECONDS.toNanos(10), 3);
 
   private Configurations() {}
 
-  static void printSettings(Class<?> clazz) {
+  public static void printSettings(Class<?> clazz) {
     System.out.printf(
-        "### %s: remote receiver: %s, message size: %s, repoter interval: %s sec\n",
-        clazz.getSimpleName(), RECEIVER_ADDRESS, MESSAGE_SIZE, REPORT_INTERVAL);
+        "### %s: ping address: %s, "
+            + "pong address: %s, "
+            + "msg length: %s, "
+            + "reporter interval: %ssec\n",
+        clazz.getSimpleName(), PING_ADDRESS, PONG_ADDRESS, MESSAGE_LENGTH, REPORT_INTERVAL);
   }
 
-  static Disposable startReport() {
+  public static Disposable startReport() {
     return Flux.interval(
             Duration.ofSeconds(WARMUP_REPORT_DELAY), Duration.ofSeconds(REPORT_INTERVAL))
         .doOnNext(Configurations::report)
@@ -56,13 +61,13 @@ public class Configurations {
         .subscribe();
   }
 
-  static void report(Object ignored) {
+  public static void report(Object ignored) {
     System.out.println("---- PING/PONG HISTO ----");
     HISTOGRAM.getIntervalHistogram().outputPercentileDistribution(System.out, 5, 1000.0, false);
     System.out.println("---- PING/PONG HISTO ----");
   }
 
-  static SocketAddress receive(DatagramChannel receiver, ByteBuffer rcvBuffer) {
+  public static SocketAddress receive(DatagramChannel receiver, ByteBuffer rcvBuffer) {
     SocketAddress srcAddress = null;
     try {
       srcAddress = receiver.receive(rcvBuffer);
@@ -78,7 +83,7 @@ public class Configurations {
     return srcAddress;
   }
 
-  static void write(DatagramChannel sender, ByteBuffer sndBuffer) {
+  public static void write(DatagramChannel sender, ByteBuffer sndBuffer) {
     if (!sender.isConnected()) {
       return;
     }

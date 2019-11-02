@@ -1,5 +1,7 @@
-package io.scalecube.services.benchmarks.datagram;
+package io.scalecube.services.benchmarks.datagram.raw;
 
+import io.scalecube.services.benchmarks.datagram.Configurations;
+import io.scalecube.services.benchmarks.datagram.RateReporter;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -11,7 +13,7 @@ public class RawDatagramReceiverTps {
   public static void main(String[] args) throws Exception {
     Configurations.printSettings(RawDatagramReceiverTps.class);
 
-    InetSocketAddress receiverAddress = new InetSocketAddress(8000);
+    InetSocketAddress receiverAddress = new InetSocketAddress(9000);
 
     DatagramChannel receiver = DatagramChannel.open();
     DatagramSocket socket = receiver.socket();
@@ -32,8 +34,7 @@ public class RawDatagramReceiverTps {
                 SocketAddress srcAddress = Configurations.receive(receiver, rcvBuffer);
                 if (srcAddress != null) {
                   ByteBuffer sndBuffer = (ByteBuffer) Configurations.SENDER_BUFFER.position(0);
-                  sndBuffer.putLong(0, rcvBuffer.getLong(0)); // copy client time
-                  sndBuffer.putLong(8, System.nanoTime()); // put server time
+                  sndBuffer.putLong(0, rcvBuffer.getLong(0)); // copy start time
                   reporter.onMessage(1, rcvBuffer.capacity());
                 }
               }

@@ -1,5 +1,6 @@
-package io.scalecube.services.benchmarks.datagram;
+package io.scalecube.services.benchmarks.datagram.raw;
 
+import io.scalecube.services.benchmarks.datagram.Configurations;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -13,8 +14,7 @@ public class RawDatagramPing {
   public static void main(String[] args) throws Exception {
     Configurations.printSettings(RawDatagramPing.class);
 
-    InetSocketAddress receiverAddress = new InetSocketAddress(5678);
-    InetSocketAddress senderAddress = new InetSocketAddress(Configurations.RECEIVER_ADDRESS, 8000);
+    InetSocketAddress receiverAddress = new InetSocketAddress(8000);
 
     DatagramChannel receiver = DatagramChannel.open();
     DatagramSocket socket = receiver.socket();
@@ -25,11 +25,11 @@ public class RawDatagramPing {
 
     DatagramChannel sender = DatagramChannel.open();
     sender.configureBlocking(false);
-    sender.connect(senderAddress);
+    sender.connect(Configurations.PONG_ADDRESS);
     do {
       TimeUnit.SECONDS.sleep(1);
     } while (!sender.isConnected());
-    System.out.println("RawDatagramPing.sender connected: " + senderAddress);
+    System.out.println("RawDatagramPing.sender connected: " + Configurations.PONG_ADDRESS);
 
     Configurations.HISTOGRAM.reset();
     Disposable reporter = Configurations.startReport();
@@ -40,7 +40,7 @@ public class RawDatagramPing {
             () -> {
               while (true) {
                 ByteBuffer sndBuffer = (ByteBuffer) Configurations.SENDER_BUFFER.position(0);
-                sndBuffer.putLong(0, System.nanoTime()); // put client time
+                sndBuffer.putLong(0, System.nanoTime()); // put start time
                 Configurations.write(sender, sndBuffer);
               }
             });
@@ -55,10 +55,8 @@ public class RawDatagramPing {
                 ByteBuffer rcvBuffer = (ByteBuffer) Configurations.RECEIVER_BUFFER.position(0);
                 SocketAddress srcAddress = Configurations.receive(receiver, rcvBuffer);
                 if (srcAddress != null) {
-                  long rcvTime = System.nanoTime();
-                  long sndTime = rcvBuffer.getLong(0);
-                  long srvTime = rcvBuffer.getLong(8);
-                  Configurations.HISTOGRAM.recordValue(rcvTime - sndTime);
+                  long start = rcvBuffer.getLong(0);
+                  Configurations.HISTOGRAM.recordValue(System.nanoTime() - start);
                 }
               }
             });

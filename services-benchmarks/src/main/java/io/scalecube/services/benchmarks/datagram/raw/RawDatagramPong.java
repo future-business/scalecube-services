@@ -1,5 +1,6 @@
-package io.scalecube.services.benchmarks.datagram;
+package io.scalecube.services.benchmarks.datagram.raw;
 
+import io.scalecube.services.benchmarks.datagram.Configurations;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -12,8 +13,7 @@ public class RawDatagramPong {
   public static void main(String[] args) throws Exception {
     Configurations.printSettings(RawDatagramPong.class);
 
-    InetSocketAddress receiverAddress = new InetSocketAddress(8000);
-    InetSocketAddress senderAddress = new InetSocketAddress(Configurations.RECEIVER_ADDRESS, 5678);
+    InetSocketAddress receiverAddress = new InetSocketAddress(9000);
 
     DatagramChannel receiver = DatagramChannel.open();
     DatagramSocket socket = receiver.socket();
@@ -24,11 +24,11 @@ public class RawDatagramPong {
 
     DatagramChannel sender = DatagramChannel.open();
     sender.configureBlocking(false);
-    sender.connect(senderAddress);
+    sender.connect(Configurations.PING_ADDRESS);
     do {
       TimeUnit.SECONDS.sleep(1);
     } while (!sender.isConnected());
-    System.out.println("RawDatagramPong.sender connected: " + senderAddress);
+    System.out.println("RawDatagramPong.sender connected: " + Configurations.PING_ADDRESS);
 
     // receiver
     Thread receiverThread =
@@ -39,8 +39,7 @@ public class RawDatagramPong {
                 SocketAddress srcAddress = Configurations.receive(receiver, rcvBuffer);
                 if (srcAddress != null) {
                   ByteBuffer sndBuffer = (ByteBuffer) Configurations.SENDER_BUFFER.position(0);
-                  sndBuffer.putLong(0, rcvBuffer.getLong(0)); // copy client time
-                  sndBuffer.putLong(8, System.nanoTime()); // put server time
+                  sndBuffer.putLong(0, rcvBuffer.getLong(0)); // copy start time
                   Configurations.write(sender, sndBuffer);
                 }
               }
