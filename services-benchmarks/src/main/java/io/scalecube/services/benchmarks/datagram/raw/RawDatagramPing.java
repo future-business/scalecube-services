@@ -18,7 +18,6 @@ public class RawDatagramPing {
 
     DatagramChannel receiver = DatagramChannel.open();
     DatagramSocket socket = receiver.socket();
-    socket.setReuseAddress(true);
     socket.bind(receiverAddress);
     receiver.configureBlocking(false);
     System.out.println("RawDatagramPing.receiver bound: " + receiver + " on " + receiverAddress);
@@ -41,7 +40,7 @@ public class RawDatagramPing {
               while (true) {
                 ByteBuffer sndBuffer = (ByteBuffer) Configurations.SENDER_BUFFER.position(0);
                 sndBuffer.putLong(0, System.nanoTime()); // put start time
-                Configurations.write(sender, sndBuffer);
+                Runners.write(sender, sndBuffer);
               }
             });
     senderThread.setUncaughtExceptionHandler((t, e) -> e.printStackTrace());
@@ -53,7 +52,7 @@ public class RawDatagramPing {
             () -> {
               while (true) {
                 ByteBuffer rcvBuffer = (ByteBuffer) Configurations.RECEIVER_BUFFER.position(0);
-                SocketAddress srcAddress = Configurations.receive(receiver, rcvBuffer);
+                SocketAddress srcAddress = Runners.receive(receiver, rcvBuffer);
                 if (srcAddress != null) {
                   long start = rcvBuffer.getLong(0);
                   Configurations.HISTOGRAM.recordValue(System.nanoTime() - start);

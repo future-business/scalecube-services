@@ -17,7 +17,6 @@ public class RawDatagramReceiverTps {
 
     DatagramChannel receiver = DatagramChannel.open();
     DatagramSocket socket = receiver.socket();
-    socket.setReuseAddress(true);
     socket.bind(receiverAddress);
     receiver.configureBlocking(false);
     System.out.println(
@@ -31,7 +30,7 @@ public class RawDatagramReceiverTps {
             () -> {
               while (true) {
                 ByteBuffer rcvBuffer = (ByteBuffer) Configurations.RECEIVER_BUFFER.position(0);
-                SocketAddress srcAddress = Configurations.receive(receiver, rcvBuffer);
+                SocketAddress srcAddress = Runners.receive(receiver, rcvBuffer);
                 if (srcAddress != null) {
                   ByteBuffer sndBuffer = (ByteBuffer) Configurations.SENDER_BUFFER.position(0);
                   sndBuffer.putLong(0, rcvBuffer.getLong(0)); // copy start time

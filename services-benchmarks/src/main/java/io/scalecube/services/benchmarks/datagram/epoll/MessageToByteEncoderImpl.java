@@ -5,7 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import io.scalecube.services.benchmarks.datagram.Configurations;
 
-public class MessageToByteEncoderImpl extends MessageToByteEncoder<Integer> {
+class MessageToByteEncoderImpl extends MessageToByteEncoder<Integer> {
 
   @Override
   protected void encode(ChannelHandlerContext ctx, Integer msg, ByteBuf out) {

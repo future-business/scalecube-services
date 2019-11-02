@@ -3,11 +3,11 @@ package io.scalecube.services.benchmarks.datagram.epoll;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
 import io.netty.channel.epoll.EpollDatagramChannel;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.scalecube.services.benchmarks.datagram.Configurations;
 import io.scalecube.services.benchmarks.datagram.RateReporter;
+import java.net.InetSocketAddress;
 
 public class EpollDatagramReceiverTps {
 
@@ -18,9 +18,6 @@ public class EpollDatagramReceiverTps {
 
     Bootstrap bootstrap =
         new Bootstrap()
-            .localAddress(9000)
-            .option(ChannelOption.AUTO_READ, true)
-            .option(ChannelOption.SO_REUSEADDR, true)
             .channel(EpollDatagramChannel.class)
             .group(new EpollEventLoopGroup(1))
             .handler(
@@ -32,7 +29,7 @@ public class EpollDatagramReceiverTps {
                   }
                 });
 
-    Channel channel = bootstrap.bind().channel();
+    Channel channel = bootstrap.bind(new InetSocketAddress(9000)).await().channel();
 
     channel.closeFuture().get();
   }

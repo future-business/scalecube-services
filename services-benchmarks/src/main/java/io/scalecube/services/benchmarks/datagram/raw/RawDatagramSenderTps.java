@@ -25,7 +25,7 @@ public class RawDatagramSenderTps {
               while (true) {
                 ByteBuffer sndBuffer = (ByteBuffer) Configurations.SENDER_BUFFER.position(0);
                 sndBuffer.putLong(0, System.nanoTime()); // put start time
-                Configurations.write(sender, sndBuffer);
+                Runners.write(sender, sndBuffer);
               }
             });
     senderThread.setUncaughtExceptionHandler((t, e) -> e.printStackTrace());

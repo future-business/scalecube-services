@@ -4,6 +4,7 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
+import io.netty.channel.epoll.EpollChannelOption;
 import io.netty.channel.epoll.EpollDatagramChannel;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.scalecube.services.benchmarks.datagram.Configurations;
@@ -16,8 +17,6 @@ public class EpollDatagramSenderTps {
     Bootstrap bootstrap =
         new Bootstrap()
             .remoteAddress(Configurations.PONG_ADDRESS)
-            .option(ChannelOption.AUTO_READ, true)
-            .option(ChannelOption.SO_REUSEADDR, true)
             .channel(EpollDatagramChannel.class)
             .group(new EpollEventLoopGroup(1))
             .handler(

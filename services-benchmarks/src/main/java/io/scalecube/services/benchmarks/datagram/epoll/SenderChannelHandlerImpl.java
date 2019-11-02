@@ -4,7 +4,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 
-public class SenderChannelHandlerImpl extends ChannelDuplexHandler {
+class SenderChannelHandlerImpl extends ChannelDuplexHandler {
 
   @Override
   public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {

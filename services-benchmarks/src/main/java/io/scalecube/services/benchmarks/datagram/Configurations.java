@@ -2,18 +2,13 @@ package io.scalecube.services.benchmarks.datagram;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
-import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.PortUnreachableException;
-import java.net.SocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.DatagramChannel;
 import java.time.Duration;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import org.HdrHistogram.Recorder;
 import reactor.core.Disposable;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 
 public class Configurations {
@@ -65,39 +60,5 @@ public class Configurations {
     System.out.println("---- PING/PONG HISTO ----");
     HISTOGRAM.getIntervalHistogram().outputPercentileDistribution(System.out, 5, 1000.0, false);
     System.out.println("---- PING/PONG HISTO ----");
-  }
-
-  public static SocketAddress receive(DatagramChannel receiver, ByteBuffer rcvBuffer) {
-    SocketAddress srcAddress = null;
-    try {
-      srcAddress = receiver.receive(rcvBuffer);
-    } catch (PortUnreachableException e) {
-      // no-op
-    } catch (IOException e) {
-      throw Exceptions.propagate(e);
-    }
-    if (srcAddress != null && rcvBuffer.position() != rcvBuffer.capacity()) {
-      throw new RuntimeException(
-          "rcvBuffer.position=" + rcvBuffer.position() + ", expected " + rcvBuffer.capacity());
-    }
-    return srcAddress;
-  }
-
-  public static void write(DatagramChannel sender, ByteBuffer sndBuffer) {
-    if (!sender.isConnected()) {
-      return;
-    }
-    int w = 0;
-    try {
-      w = sender.write(sndBuffer);
-    } catch (PortUnreachableException e) {
-      // no-op
-    } catch (IOException e) {
-      throw Exceptions.propagate(e);
-    }
-    if (w > 0 && sndBuffer.position() != sndBuffer.capacity()) {
-      throw new RuntimeException(
-          "sndBuffer.position=" + sndBuffer.position() + ", expected " + sndBuffer.capacity());
-    }
   }
 }
