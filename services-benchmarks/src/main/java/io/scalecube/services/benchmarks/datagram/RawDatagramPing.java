@@ -42,6 +42,16 @@ public class RawDatagramPing {
                 ByteBuffer sndBuffer = (ByteBuffer) Configurations.SENDER_BUFFER.position(0);
                 sndBuffer.putLong(0, System.nanoTime()); // put client time
                 Configurations.write(sender, sndBuffer);
+              }
+            });
+    senderThread.setUncaughtExceptionHandler((t, e) -> e.printStackTrace());
+    senderThread.start();
+
+    // receiver
+    Thread receiverThread =
+        new Thread(
+            () -> {
+              while (true) {
                 ByteBuffer rcvBuffer = (ByteBuffer) Configurations.RECEIVER_BUFFER.position(0);
                 SocketAddress srcAddress = Configurations.receive(receiver, rcvBuffer);
                 if (srcAddress != null) {
@@ -52,7 +62,7 @@ public class RawDatagramPing {
                 }
               }
             });
-    senderThread.setUncaughtExceptionHandler((t, e) -> e.printStackTrace());
-    senderThread.start();
+    receiverThread.setUncaughtExceptionHandler((t, e) -> e.printStackTrace());
+    receiverThread.start();
   }
 }
