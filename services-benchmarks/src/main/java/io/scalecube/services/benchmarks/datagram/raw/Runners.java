@@ -9,6 +9,8 @@ import reactor.core.Exceptions;
 
 class Runners {
 
+  public static final int SANITY_NUMBER = 42100500;
+
   private Runners() {}
 
   static SocketAddress receive(DatagramChannel receiver, ByteBuffer rcvBuffer) {
@@ -26,10 +28,16 @@ class Runners {
       throw Exceptions.propagate(e);
     }
 
-    if (srcAddress != null && rcvBuffer.position() != rcvBuffer.capacity()) {
-      throw new RuntimeException(
-          "rcvBuffer.position=" + rcvBuffer.position() + ", expected " + rcvBuffer.capacity());
+    if (srcAddress != null) {
+      if (rcvBuffer.position() != rcvBuffer.capacity()) {
+        throw new RuntimeException(
+            "rcvBuffer.position=" + rcvBuffer.position() + ", expected " + rcvBuffer.capacity());
+      }
+      if (rcvBuffer.getInt(rcvBuffer.capacity() - 4) != SANITY_NUMBER) {
+        throw new IllegalArgumentException("rcvBuffer isn't prepended with SANITY_NUMBER");
+      }
     }
+
     return srcAddress;
   }
 
@@ -42,6 +50,9 @@ class Runners {
     if (!sender.isConnected()) {
       return;
     }
+
+    sndBuffer.putInt(sndBuffer.capacity() - 4, SANITY_NUMBER);
+
     int w = 0;
     try {
       w = sender.write(sndBuffer);
