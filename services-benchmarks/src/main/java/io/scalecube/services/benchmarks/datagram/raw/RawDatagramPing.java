@@ -1,7 +1,6 @@
 package io.scalecube.services.benchmarks.datagram.raw;
 
 import io.scalecube.services.benchmarks.datagram.Configurations;
-import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
@@ -17,12 +16,17 @@ public class RawDatagramPing {
     InetSocketAddress receiverAddress = new InetSocketAddress(8000);
 
     DatagramChannel receiver = DatagramChannel.open();
-    DatagramSocket socket = receiver.socket();
-    socket.bind(receiverAddress);
+    receiver.socket().setReuseAddress(true);
+    receiver.socket().setReceiveBufferSize(Configurations.SOCKET_BUFFER_SIZE);
+    receiver.socket().setSendBufferSize(Configurations.SOCKET_BUFFER_SIZE);
+    receiver.socket().bind(receiverAddress);
     receiver.configureBlocking(false);
     System.out.println("RawDatagramPing.receiver bound: " + receiver + " on " + receiverAddress);
 
     DatagramChannel sender = DatagramChannel.open();
+    sender.socket().setReuseAddress(true);
+    sender.socket().setReceiveBufferSize(Configurations.SOCKET_BUFFER_SIZE);
+    sender.socket().setSendBufferSize(Configurations.SOCKET_BUFFER_SIZE);
     sender.configureBlocking(false);
     sender.connect(Configurations.PONG_ADDRESS);
     do {

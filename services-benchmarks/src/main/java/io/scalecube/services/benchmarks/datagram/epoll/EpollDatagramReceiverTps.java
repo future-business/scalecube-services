@@ -3,6 +3,7 @@ package io.scalecube.services.benchmarks.datagram.epoll;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.epoll.EpollDatagramChannel;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.handler.codec.DatagramPacketDecoder;
@@ -21,6 +22,9 @@ public class EpollDatagramReceiverTps {
         new Bootstrap()
             .channel(EpollDatagramChannel.class)
             .group(new EpollEventLoopGroup(1))
+            .option(ChannelOption.SO_REUSEADDR, true)
+            .option(ChannelOption.SO_RCVBUF, Configurations.SOCKET_BUFFER_SIZE)
+            .option(ChannelOption.SO_SNDBUF, Configurations.SOCKET_BUFFER_SIZE)
             .handler(
                 new ChannelInitializer<Channel>() {
                   @Override

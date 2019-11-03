@@ -11,6 +11,9 @@ public class RawDatagramSenderTps {
     Configurations.printSettings(RawDatagramSenderTps.class);
 
     DatagramChannel sender = DatagramChannel.open();
+    sender.socket().setReuseAddress(true);
+    sender.socket().setReceiveBufferSize(Configurations.SOCKET_BUFFER_SIZE);
+    sender.socket().setSendBufferSize(Configurations.SOCKET_BUFFER_SIZE);
     sender.configureBlocking(false);
     sender.connect(Configurations.PONG_ADDRESS);
     do {

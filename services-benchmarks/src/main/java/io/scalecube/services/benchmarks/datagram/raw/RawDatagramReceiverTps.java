@@ -2,7 +2,6 @@ package io.scalecube.services.benchmarks.datagram.raw;
 
 import io.scalecube.services.benchmarks.datagram.Configurations;
 import io.scalecube.services.benchmarks.datagram.RateReporter;
-import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
@@ -16,8 +15,10 @@ public class RawDatagramReceiverTps {
     InetSocketAddress receiverAddress = new InetSocketAddress(9000);
 
     DatagramChannel receiver = DatagramChannel.open();
-    DatagramSocket socket = receiver.socket();
-    socket.bind(receiverAddress);
+    receiver.socket().setReuseAddress(true);
+    receiver.socket().setReceiveBufferSize(Configurations.SOCKET_BUFFER_SIZE);
+    receiver.socket().setSendBufferSize(Configurations.SOCKET_BUFFER_SIZE);
+    receiver.socket().bind(receiverAddress);
     receiver.configureBlocking(false);
     System.out.println(
         "RawDatagramReceiverTps.receiver bound: " + receiver + " on " + receiverAddress);
