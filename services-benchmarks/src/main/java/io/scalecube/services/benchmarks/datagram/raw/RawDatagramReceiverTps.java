@@ -16,8 +16,8 @@ public class RawDatagramReceiverTps {
 
     DatagramChannel receiver = DatagramChannel.open();
     receiver.socket().setReuseAddress(true);
-    receiver.socket().setReceiveBufferSize(Configurations.SOCKET_BUFFER_SIZE);
-    receiver.socket().setSendBufferSize(Configurations.SOCKET_BUFFER_SIZE);
+    receiver.socket().setReceiveBufferSize(Configurations.RCV_BUFFER_SIZE);
+    receiver.socket().setSendBufferSize(Configurations.SND_BUFFER_SIZE);
     receiver.socket().bind(receiverAddress);
     receiver.configureBlocking(false);
     System.out.println(

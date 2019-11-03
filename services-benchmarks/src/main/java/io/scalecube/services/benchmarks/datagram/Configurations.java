@@ -16,8 +16,9 @@ public class Configurations {
   public static final int REPORT_INTERVAL = Integer.getInteger("reporter.interval", 1);
   public static final int WARMUP_REPORT_DELAY =
       Integer.getInteger("reporter.delay", REPORT_INTERVAL);
-  public static final int MESSAGE_LENGTH = Integer.getInteger("messageLength", 256);
-  public static final int SOCKET_BUFFER_SIZE = Integer.getInteger("socketBufferSize", 2048);
+  public static final int MESSAGE_LENGTH = Integer.getInteger("messageLength", 65535 - 20 - 8);
+  public static final int RCV_BUFFER_SIZE = Integer.getInteger("rcvBufferSize", 212992);
+  public static final int SND_BUFFER_SIZE = Integer.getInteger("sndBufferSize", 212992);
   public static final InetSocketAddress PING_ADDRESS;
   public static final InetSocketAddress PONG_ADDRESS;
   public static final ByteBuffer SENDER_BUFFER;
@@ -44,14 +45,18 @@ public class Configurations {
     System.out.printf(
         "### %s: ping address: %s, "
             + "pong address: %s, "
-            + "msg length: %s, "
-            + "socket buffer size: %s, "
+            + "SENDER_BUFFER capacity: %s, "
+            + "RECEIVER_BUFFER capacity: %s, "
+            + "socket send-buffer size: %s, "
+            + "socket receive-buffer size: %s, "
             + "reporter interval: %ssec\n",
         clazz.getSimpleName(),
         PING_ADDRESS,
         PONG_ADDRESS,
-        MESSAGE_LENGTH,
-        SOCKET_BUFFER_SIZE,
+        SENDER_BUFFER.capacity(),
+        RECEIVER_BUFFER.capacity(),
+        RCV_BUFFER_SIZE,
+        SND_BUFFER_SIZE,
         REPORT_INTERVAL);
   }
 

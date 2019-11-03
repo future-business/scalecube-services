@@ -23,8 +23,8 @@ public class EpollDatagramReceiverTps {
             .channel(EpollDatagramChannel.class)
             .group(new EpollEventLoopGroup(1))
             .option(ChannelOption.SO_REUSEADDR, true)
-            .option(ChannelOption.SO_RCVBUF, Configurations.SOCKET_BUFFER_SIZE)
-            .option(ChannelOption.SO_SNDBUF, Configurations.SOCKET_BUFFER_SIZE)
+            .option(ChannelOption.SO_RCVBUF, Configurations.RCV_BUFFER_SIZE)
+            .option(ChannelOption.SO_SNDBUF, Configurations.SND_BUFFER_SIZE)
             .handler(
                 new ChannelInitializer<Channel>() {
                   @Override

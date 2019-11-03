@@ -12,6 +12,11 @@ class Runners {
   private Runners() {}
 
   static SocketAddress receive(DatagramChannel receiver, ByteBuffer rcvBuffer) {
+    if (rcvBuffer.position() != 0) {
+      throw new IllegalArgumentException(
+          "rcvBuffer.position=" + rcvBuffer.position() + ", expected 0");
+    }
+
     SocketAddress srcAddress = null;
     try {
       srcAddress = receiver.receive(rcvBuffer);
@@ -20,6 +25,7 @@ class Runners {
     } catch (IOException e) {
       throw Exceptions.propagate(e);
     }
+
     if (srcAddress != null && rcvBuffer.position() != rcvBuffer.capacity()) {
       throw new RuntimeException(
           "rcvBuffer.position=" + rcvBuffer.position() + ", expected " + rcvBuffer.capacity());
@@ -28,6 +34,11 @@ class Runners {
   }
 
   static void write(DatagramChannel sender, ByteBuffer sndBuffer) {
+    if (sndBuffer.position() != 0) {
+      throw new IllegalArgumentException(
+          "sndBuffer.position=" + sndBuffer.position() + ", expected 0");
+    }
+
     if (!sender.isConnected()) {
       return;
     }
@@ -39,6 +50,7 @@ class Runners {
     } catch (IOException e) {
       throw Exceptions.propagate(e);
     }
+
     if (w > 0 && sndBuffer.position() != sndBuffer.capacity()) {
       throw new RuntimeException(
           "sndBuffer.position=" + sndBuffer.position() + ", expected " + sndBuffer.capacity());

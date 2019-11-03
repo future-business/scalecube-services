@@ -17,16 +17,16 @@ public class RawDatagramPing {
 
     DatagramChannel receiver = DatagramChannel.open();
     receiver.socket().setReuseAddress(true);
-    receiver.socket().setReceiveBufferSize(Configurations.SOCKET_BUFFER_SIZE);
-    receiver.socket().setSendBufferSize(Configurations.SOCKET_BUFFER_SIZE);
+    receiver.socket().setReceiveBufferSize(Configurations.RCV_BUFFER_SIZE);
+    receiver.socket().setSendBufferSize(Configurations.SND_BUFFER_SIZE);
     receiver.socket().bind(receiverAddress);
     receiver.configureBlocking(false);
     System.out.println("RawDatagramPing.receiver bound: " + receiver + " on " + receiverAddress);
 
     DatagramChannel sender = DatagramChannel.open();
     sender.socket().setReuseAddress(true);
-    sender.socket().setReceiveBufferSize(Configurations.SOCKET_BUFFER_SIZE);
-    sender.socket().setSendBufferSize(Configurations.SOCKET_BUFFER_SIZE);
+    sender.socket().setReceiveBufferSize(Configurations.RCV_BUFFER_SIZE);
+    sender.socket().setSendBufferSize(Configurations.SND_BUFFER_SIZE);
     sender.configureBlocking(false);
     sender.connect(Configurations.PONG_ADDRESS);
     do {
