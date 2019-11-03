@@ -26,8 +26,8 @@ public class EpollDatagramSenderTps {
                   @Override
                   protected void initChannel(Channel ch) {
                     ch.pipeline().addLast(new ChannelHandlerImpl());
-                    ch.pipeline().addLast(new ChannelWriter());
                     ch.pipeline().addLast(new MessageEncoderTps());
+                    ch.pipeline().addLast(new ChannelWriter());
                   }
                 });
 

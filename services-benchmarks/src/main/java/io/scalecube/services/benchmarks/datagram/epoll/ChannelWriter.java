@@ -13,7 +13,7 @@ class ChannelWriter extends ChannelDuplexHandler {
       System.out.println("Sending..");
       while (true) {
         if (channel.isActive()) {
-          channel.writeAndFlush(1, ctx.voidPromise());
+          ctx.writeAndFlush(1, ctx.voidPromise());
         }
       }
     } else {
