@@ -37,19 +37,35 @@ public class RawDatagramPing {
     Configurations.HISTOGRAM.reset();
     Disposable reporter = Configurations.startReport();
 
-    // sender and receiver
-    System.out.println("Sending and Receiving..");
-    while (true) {
-      ByteBuffer sndBuffer = (ByteBuffer) Configurations.SENDER_BUFFER.position(0);
-      sndBuffer.putLong(0, System.nanoTime()); // put start time
-      Runners.write(sender, sndBuffer);
+    // sender
+    Thread senderThread =
+        new Thread(
+            () -> {
+              System.out.println("Sending..");
+              while (true) {
+                ByteBuffer sndBuffer = (ByteBuffer) Configurations.SENDER_BUFFER.position(0);
+                sndBuffer.putLong(0, System.nanoTime()); // put start time
+                Runners.write(sender, sndBuffer);
+              }
+            });
+    senderThread.setUncaughtExceptionHandler((t, e) -> e.printStackTrace());
+    senderThread.start();
 
-      ByteBuffer rcvBuffer = (ByteBuffer) Configurations.RECEIVER_BUFFER.position(0);
-      SocketAddress srcAddress = Runners.receive(receiver, rcvBuffer);
-      if (srcAddress != null) {
-        long start = rcvBuffer.getLong(0);
-        Configurations.HISTOGRAM.recordValue(System.nanoTime() - start);
-      }
-    }
+    // receiver
+    Thread receiverThread =
+        new Thread(
+            () -> {
+              System.out.println("Receiving..");
+              while (true) {
+                ByteBuffer rcvBuffer = (ByteBuffer) Configurations.RECEIVER_BUFFER.position(0);
+                SocketAddress srcAddress = Runners.receive(receiver, rcvBuffer);
+                if (srcAddress != null) {
+                  long start = rcvBuffer.getLong(0);
+                  Configurations.HISTOGRAM.recordValue(System.nanoTime() - start);
+                }
+              }
+            });
+    receiverThread.setUncaughtExceptionHandler((t, e) -> e.printStackTrace());
+    receiverThread.start();
   }
 }
