@@ -22,16 +22,10 @@ public class RawDatagramSenderTps {
     System.out.println("RawDatagramSenderTps.sender connected: " + Configurations.PONG_ADDRESS);
 
     // sender
-    Thread senderThread =
-        new Thread(
-            () -> {
-              System.out.println("Sending..");
-              while (true) {
-                ByteBuffer sndBuffer = (ByteBuffer) Configurations.SENDER_BUFFER.position(0);
-                Runners.write(sender, sndBuffer);
-              }
-            });
-    senderThread.setUncaughtExceptionHandler((t, e) -> e.printStackTrace());
-    senderThread.start();
+    System.out.println("Sending..");
+    while (true) {
+      ByteBuffer sndBuffer = (ByteBuffer) Configurations.SENDER_BUFFER.position(0);
+      Runners.write(sender, sndBuffer);
+    }
   }
 }

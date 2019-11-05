@@ -26,19 +26,13 @@ public class RawDatagramReceiverTps {
     RateReporter reporter = new RateReporter();
 
     // receiver
-    Thread receiverThread =
-        new Thread(
-            () -> {
-              System.out.println("Receiving..");
-              while (true) {
-                ByteBuffer rcvBuffer = (ByteBuffer) Configurations.RECEIVER_BUFFER.position(0);
-                SocketAddress srcAddress = Runners.receive(receiver, rcvBuffer);
-                if (srcAddress != null) {
-                  reporter.onMessage(1, rcvBuffer.capacity());
-                }
-              }
-            });
-    receiverThread.setUncaughtExceptionHandler((t, e) -> e.printStackTrace());
-    receiverThread.start();
+    System.out.println("Receiving..");
+    while (true) {
+      ByteBuffer rcvBuffer = (ByteBuffer) Configurations.RECEIVER_BUFFER.position(0);
+      SocketAddress srcAddress = Runners.receive(receiver, rcvBuffer);
+      if (srcAddress != null) {
+        reporter.onMessage(1, rcvBuffer.capacity());
+      }
+    }
   }
 }
